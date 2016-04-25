@@ -8,7 +8,7 @@
 MODULE_LICENSE("Dual BSD/GPL");
 
 //ATTENTION:
-//pwm linux driver driver does not set the corresponding alternative function
+//pwm linux device driver does not set the corresponding alternative function
 //in the GPIO, so, we have 2 options:
 //1) every time we do: echo mode1 > /sys/kernel/debug/gpio_debug/gpio183/current_pinmux
 //2) setup mode1 in this driver by hand.
