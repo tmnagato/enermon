@@ -11,7 +11,7 @@ MODULE_LICENSE("Dual BSD/GPL");
 //pwm linux device driver does not set the corresponding alternative function
 //in the GPIO, so, we have 2 options:
 //1) every time we do: echo mode1 > /sys/kernel/debug/gpio_debug/gpio183/current_pinmux
-//2) setup mode1 in this driver by hand.
+//2) setup mode1 in this driver by hand (GAFR register does not work, we need to go through FLIS registers. See langwell gpio driver).
 
 #define DRIVER_NAME	"edison-pwm-eval"
 

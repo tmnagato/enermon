@@ -23,6 +23,8 @@ enum GPIO_REG
     GAFR        //alt function
 } ;
 
+//ATTENTION: it seems that GAFR does not work for tangier chip (Edison). 
+//we need to go through FLIS registers. See langwell gpio driver.
 #define DRIVER_NAME	"edison_gpio"
 
 #define NGPIO 192
