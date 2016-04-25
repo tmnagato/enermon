@@ -6,9 +6,12 @@
 #include <linux/gpio.h>
 MODULE_LICENSE("Dual BSD/GPL");
 
-
+// Edison GPIO base address. This address was collected from PCI device.
 #define GPIO_REG_BASE   0xFF008000
-#define GPIO_MEM_LEN    192
+//Edison number of GPIO
+#define NGPIO 192
+//Memory size for gpio registers
+#define GPIO_MEM_LEN    ((NGPIO/32)*9*4 + 4)    // we have 9 GPIO reg for each GPIO block of 32.; +4 because we start at the REG_GPLR_OFFSET
 #define REG_GPLR_OFFSET 0x04
 
 enum GPIO_REG
@@ -23,14 +26,15 @@ enum GPIO_REG
     GAFR        //alt function
 } ;
 
-#define DRIVER_NAME	"edison_gpio"
+#define DRIVER_NAME	"max11046"
 
-#define NGPIO 192
-
-void __iomem *reg_base;
+//store gpio controller base address
 void __iomem *gpio;
+//store gpio registers base address
+void __iomem *reg_base;
 
 
+//Get the address of the reg_type register to the specific offset gpio
 static void __iomem *gpio_reg(unsigned offset, enum GPIO_REG reg_type)
 {
     unsigned nreg = NGPIO / 32;
@@ -39,6 +43,7 @@ static void __iomem *gpio_reg(unsigned offset, enum GPIO_REG reg_type)
     return reg_base + reg_type * nreg * 4 + reg * 4; 
 }
 
+//Get the address of the reg_type register to the specific offset gpio (each offset ocupies 2 bit), used e.g. for alternative gp function
 static void __iomem *gpio_reg_2bit(unsigned offset, enum GPIO_REG reg_type)
 {
     unsigned nreg = NGPIO / 32;
@@ -47,6 +52,7 @@ static void __iomem *gpio_reg_2bit(unsigned offset, enum GPIO_REG reg_type)
     return reg_base + reg_type * nreg * 4 + reg * 4; 
 }
 
+//Set the specific gpio offset to the GPIO alternative function
 static int gpio_req(unsigned offset)
 {
     void __iomem *gafr = gpio_reg_2bit(offset, GAFR);
@@ -61,11 +67,11 @@ static int gpio_req(unsigned offset)
     return 0; 
 }
 
-static int hello_init(void)
+static int max11046_init(void)
 {       
     printk(KERN_ALERT "Hello, world\n");
     
-    //map io memory
+    //map GPIO IO memory
     gpio = ioremap_nocache(GPIO_REG_BASE, GPIO_MEM_LEN);
     
     if(gpio == NULL)
@@ -105,12 +111,12 @@ static int hello_init(void)
     return 0;
 }
 
-static void hello_exit(void)
+static void max11046_exit(void)
 {
     iounmap(gpio);
     printk(KERN_ALERT  "Goodbye, cruel world\n");
 }
-module_init(hello_init);
-module_exit(hello_exit);
+module_init(max11046_init);
+module_exit(max11046_exit);
 
 
